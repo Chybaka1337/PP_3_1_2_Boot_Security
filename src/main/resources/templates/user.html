@@ -5,7 +5,16 @@
 </head>
 <body>
 <h1>User, welcome spring boot security page!</h1>
-
-
+<p th:text="'username: ' + ${user.name} + ' age: ' + ${user.age}"/>
+<ul>
+    <li th:each="role : ${user.roles}" th:text="${role.roleName}"></li>
+</ul>
+<a th:href="@{/admin}" th:if="${user.roles.contains('ROLE_ADMIN')}">administrate</a>
+<p/>
+<p/>
+<p/>
+<form th:action="@{/logout}" th:method="POST">
+    <input type="submit" value="Logout"/>
+</form>
 </body>
 </html>
