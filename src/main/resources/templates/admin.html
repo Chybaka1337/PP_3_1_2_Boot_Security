@@ -7,11 +7,11 @@
 <body>
 <div th:each="user: ${users}">
     <p th:text="'username: ' + ${user.name} + ' age: ' + ${user.age}"/>
-    <a th:href="@{/admin/user/{id}(id=${user.getId()})}">Update</a>
-    <a th:href="@{/admin/user/delete/{id}(id=${user.getId()})}">Delete</a>
     <ul>
         <li th:each="role : ${user.roles}" th:text="${role.roleName}"></li>
     </ul>
+    <a th:href="@{/admin/user/{id}(id=${user.getId()})}">Update</a>
+    <a th:href="@{/admin/user/delete/{id}(id=${user.getId()})}">Delete</a>
 </div>
 <a th:href="@{admin/create}">Create new</a>
 <p/>
