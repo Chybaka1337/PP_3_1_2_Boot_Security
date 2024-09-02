@@ -68,7 +68,7 @@ public class UserController {
     //TODO
     @PostMapping("/admin/user/{id}")
     public String updateUser(@PathVariable int id, @ModelAttribute("user") User user) {
-        userService.save(user);
+        userService.update(id, user);
         return "redirect:/admin";
     }
 
