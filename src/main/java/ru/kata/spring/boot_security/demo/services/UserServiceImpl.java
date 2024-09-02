@@ -4,12 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -43,6 +40,21 @@ public class UserServiceImpl implements UserService {
     public void save(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void update(int id, User updatedUser) {
+        User user = userRepository.getById(id);
+        String password = user.getPassword();
+        if (updatedUser.getPassword() != null
+            && !updatedUser.getPassword().isBlank()
+            && !user.getPassword().equals(passwordEncoder.encode(updatedUser.getPassword())))
+        {
+            password = passwordEncoder.encode(updatedUser.getPassword());
+        }
+        updatedUser.setPassword(password);
+        userRepository.save(updatedUser);
     }
 
     @Override
