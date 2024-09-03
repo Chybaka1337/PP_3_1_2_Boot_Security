@@ -19,7 +19,7 @@ public class UserController extends AbstractController {
     }
 
     @GetMapping()
-    public ModelAndView getUser(HttpSession http, ModelAndView mav) {
+    public ModelAndView getUserPage(HttpSession http, ModelAndView mav) {
         User user = (User) http.getAttribute("user");
         mav
                 .addObject("user", user)

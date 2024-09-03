@@ -16,7 +16,7 @@ public class AdminController extends AbstractController {
     }
 
     @GetMapping()
-    public ModelAndView adminPage(ModelAndView mav) {
+    public ModelAndView getAdminPage(ModelAndView mav) {
         mav.setViewName("admin");
         mav.addObject("users", getUserService().getAll());
         return mav;
