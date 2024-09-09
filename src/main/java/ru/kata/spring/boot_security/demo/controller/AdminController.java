@@ -3,9 +3,12 @@ package ru.kata.spring.boot_security.demo.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
@@ -15,10 +18,13 @@ public class AdminController extends AbstractController {
         super(userService, roleService);
     }
 
+    @Override
     @GetMapping()
-    public ModelAndView getAdminPage(ModelAndView mav) {
+    public ModelAndView getPage(HttpSession http, ModelAndView mav) {
+        mav = super.getPage(http, mav);
         mav.setViewName("admin");
         mav.addObject("users", getUserService().getAll());
+        mav.addObject("currentPage", "admin");
         return mav;
     }
 
