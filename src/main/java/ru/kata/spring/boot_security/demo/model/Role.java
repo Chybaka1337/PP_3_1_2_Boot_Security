@@ -58,11 +58,11 @@ public class Role implements GrantedAuthority {
         if (this == o) return true;
         if (!(o instanceof Role)) return false;
         Role role = (Role) o;
-        return id == role.id;
+        return Objects.equals(roleName, role.roleName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(roleName);
     }
 }
