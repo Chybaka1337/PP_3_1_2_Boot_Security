@@ -9,6 +9,10 @@ import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,31 +26,17 @@ public class AdminController extends AbstractController {
     @GetMapping()
     public ModelAndView getPage(HttpSession http, ModelAndView mav) {
         mav = super.getPage(http, mav);
-        mav.setViewName("admin");
         mav.addObject("users", getUserService().getAll());
-        mav.addObject("currentPage", "admin");
+        mav.addObject("newUser", new User());
+        mav.addObject("roles", getRoleService().getAll());
+        mav.setViewName("admin");
         return mav;
     }
 
-    @GetMapping("/create")
-    public ModelAndView saveUser() {
-        return new ModelAndView("saveUser")
-                .addObject("user", new User())
-                .addObject("roles", getRoleService().getAll());
-    }
-
     @PostMapping("/create")
-    public String saveUser(@ModelAttribute("user") User user) {
+    public String saveUser(@ModelAttribute("newUser") User user) {
         getUserService().save(user);
         return "redirect:/admin";
-    }
-
-    @GetMapping("/user/{id}")
-    public ModelAndView updateUser(@PathVariable int id) {
-        User user = getUserService().getUserById(id);
-        return new ModelAndView("updateUser")
-                .addObject("user", user)
-                .addObject("roles", getRoleService().getAll());
     }
 
     @PostMapping("/user/{id}")
