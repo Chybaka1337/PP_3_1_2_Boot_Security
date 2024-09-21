@@ -1,18 +1,19 @@
 package ru.kata.spring.boot_security.demo.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.services.RoleService;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,32 +23,79 @@ public class AdminController extends AbstractController {
         super(userService, roleService);
     }
 
-    @Override
     @GetMapping()
-    public ModelAndView getPage(HttpSession http, ModelAndView mav) {
-        mav = super.getPage(http, mav);
-        mav.addObject("users", getUserService().getAll());
-        mav.addObject("newUser", new User());
-        mav.addObject("roles", getRoleService().getAll());
+    public ModelAndView getPage(ModelAndView mav) {
         mav.setViewName("admin");
         return mav;
     }
 
-    @PostMapping("/create")
-    public String saveUser(@ModelAttribute("newUser") User user) {
-        getUserService().save(user);
-        return "redirect:/admin";
+    @ResponseBody
+    @GetMapping("/api")
+    public ResponseEntity<UserDTO> getAdmin(HttpSession http) {
+        UserDTO user = UserDTO.of((User) http.getAttribute("user"));
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(user);
     }
 
-    @PostMapping("/user/{id}")
-    public String updateUser(@PathVariable int id, @ModelAttribute("user") User user) {
-        getUserService().update(id, user);
-        return "redirect:/admin";
+    @ResponseBody
+    @GetMapping("/api/users")
+    public ResponseEntity<List<UserDTO>> getUsers() {
+        List<UserDTO> users = getUserService().getAll()
+                .stream()
+                .map(UserDTO::of)
+                .collect(Collectors.toList());
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(users);
     }
 
-    @GetMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable int id) {
-        getUserService().delete(getUserService().getUserById(id));
-        return "redirect:/admin";
+    @ResponseBody
+    @GetMapping("/api/user/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable int id) {
+        UserDTO user = UserDTO.of(getUserService().getUserById(id));
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(user);
     }
+
+    @ResponseBody
+    @GetMapping("/api/roles")
+    public ResponseEntity<List<Role>> getRoles() {
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(getRoleService().getAll());
+    }
+
+    @ResponseBody
+    @PostMapping("/api/create")
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        getUserService().save(userDTO.toUser());
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(userDTO);
+    }
+
+    @ResponseBody
+    @PostMapping("/api/user/{id}")
+    public ResponseEntity<UserDTO> editUser(@PathVariable int id, @RequestBody UserDTO userDTO) {
+        getUserService().update(id, userDTO.toUser());
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(userDTO);
+    }
+
+    @ResponseBody
+    @GetMapping("/api/delete/{id}")
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable int id) {
+        User user = getUserService().getUserById(id);
+        if (user != null) {
+            getUserService().delete(user);
+        }
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .build();
+    }
+
+
 }
